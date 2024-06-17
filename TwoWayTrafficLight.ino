@@ -1,16 +1,10 @@
 #include <LiquidCrystal_I2C.h>
+#include "traffic_light.hpp"
 
 LiquidCrystal_I2C lcdScreen(0x27, 16, 2);
 
-// signal 1
-uint8_t signalOneRedLedPin = PIN2;
-uint8_t signalOneYellowLedPin = PIN3;
-uint8_t signalOneGreenLedPin = PIN4;
-
-// signal 2
-uint8_t signalTwoRedLedPin = PIN5;
-uint8_t signalTwoYellowLedPin = PIN6;
-uint8_t signalTwoGreenLedPin = PIN7;
+TrafficLight signalOne(PIN2, PIN3, PIN4);
+TrafficLight signalTwo(PIN5, PIN6, PIN7);
 
 // led time in millisecond
 uint32_t greenLedTime = 7000;
@@ -20,56 +14,39 @@ void setup() {
   lcdScreen.init();
   lcdScreen.backlight();
 
-  // pin mode of signal 1
-  pinMode(signalOneGreenLedPin, OUTPUT);
-  pinMode(signalOneYellowLedPin, OUTPUT);
-  pinMode(signalOneRedLedPin, OUTPUT);
-
-  // pin mode of signal 2
-  pinMode(signalTwoGreenLedPin, OUTPUT);
-  pinMode(signalTwoYellowLedPin, OUTPUT);
-  pinMode(signalTwoRedLedPin, OUTPUT);
+  signalOne.init();
+  signalTwo.init();
 }
 
 void loop() {
   // signal 1 is turned on
-  turnOffAllLed();
-  printInforOnLcdSreen("X", "X", "D", "D");
-  digitalWrite(signalOneGreenLedPin, HIGH);
-  digitalWrite(signalTwoRedLedPin, HIGH);
+  signalOne.turnOff();
+  signalTwo.turnOff();
+  printInforOnLcdSreen("X", "D");
+  signalOne.turnOnGreenLed();
+  signalTwo.turnOnRedLed();
   delay(greenLedTime);
 
-  printInforOnLcdSreen("V", "V", "D", "D");
-  digitalWrite(signalOneGreenLedPin, LOW);
-  digitalWrite(signalOneYellowLedPin, HIGH);
+  printInforOnLcdSreen("V", "D");
+  signalOne.turnOnYellowLed();
   delay(yellowLedTime);
 
   // signal 2 is turned on
-  turnOffAllLed();
-  printInforOnLcdSreen("D", "D", "X", "X");
-  digitalWrite(signalTwoGreenLedPin, HIGH);
-  digitalWrite(signalOneRedLedPin, HIGH);
+  signalOne.turnOff();
+  signalTwo.turnOff();
+  printInforOnLcdSreen("D", "X");
+  signalTwo.turnOnGreenLed();
+  signalOne.turnOnRedLed();
   delay(greenLedTime);
 
-  printInforOnLcdSreen("D", "D", "V", "V");
-  digitalWrite(signalTwoGreenLedPin, LOW);
-  digitalWrite(signalTwoYellowLedPin, HIGH);
+  printInforOnLcdSreen("D", "V");
+  signalTwo.turnOnYellowLed();
   delay(yellowLedTime);
 }
 
-void printInforOnLcdSreen(String signalA1, String signalA2, String signalB1, String signalB2) {
+void printInforOnLcdSreen(String signalOne, String signalTwo) {
   lcdScreen.clear();
-  lcdScreen.print("A1: " + signalA1 + " - A2: " + signalA2);
+  lcdScreen.print("A1: " + signalOne + " - A2: " + signalOne);
   lcdScreen.setCursor(0, 1);
-  lcdScreen.print("B1: " + signalB1 + " - B2: " + signalB2);
-}
-
-void turnOffAllLed() {
-  digitalWrite(signalOneGreenLedPin, LOW);
-  digitalWrite(signalOneYellowLedPin, LOW);
-  digitalWrite(signalOneRedLedPin, LOW);
-
-  digitalWrite(signalTwoGreenLedPin, LOW);
-  digitalWrite(signalTwoYellowLedPin, LOW);
-  digitalWrite(signalTwoRedLedPin, LOW);
+  lcdScreen.print("B1: " + signalTwo + " - B2: " + signalTwo);
 }
